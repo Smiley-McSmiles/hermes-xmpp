@@ -1,0 +1,68 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  hermes-xmpp — the XMPP bridge for Hermes Agent
+#
+#  Bot account:        bot@example.org
+#  Password:           ../secrets/account.secret  (0600, not in git)
+#  Authorized users:   [policy] owners — currently owner@example.org
+#                      → full tools: terminal, files, projects, web
+#  Everyone else:      guest tier, zero tools, plain text answers only
+# ─────────────────────────────────────────────────────────────────────────────
+
+[account]
+jid = "bot@example.org"
+host = "example.org"
+port = 5222
+resource = "hermes"
+starttls = true
+password_file = "secrets/account.secret"
+
+# ── Authorized operators: full Hermes toolset (shell, files, projects) ───────
+# model + provider choose the exact model for these turns; they are sent with
+# every request, so this overrides the profile default. Use any OpenRouter id.
+[owner]
+url = "http://127.0.0.1:8642/v1/chat/completions"
+key_file = "secrets/owner.key"
+model = "deepseek/deepseek-v4.1-flash-1017"
+provider = "openrouter"
+timeout_s = 600
+
+# ── Everyone else: separate Hermes profile with platform_toolsets.api_server = []
+# so no tool exists in the turn at all. Text answers only.
+# Secondary profiles are served by the same listener under /p/<profile>/.
+[guest]
+url = "http://127.0.0.1:8642/p/xmpp-guest/v1/chat/completions"
+key_file = "secrets/guest.key"
+model = "deepseek/deepseek-v4.1-flash-1017"
+provider = "openrouter"
+timeout_s = 180
+
+[policy]
+# ── WHO GETS TOOL ACCESS ────────────────────────────────────────────────────
+# Add your own JIDs here (comma separated). These are matched case-insensitively
+# and ignore the /resource part.
+owners = ["owner@example.org"]
+
+max_chunk_chars = 3800
+rate_limit_per_minute = 8
+quiet_unknown_senders = false
+
+[features]
+# OMEMO 0.3 (legacy) and OMEMO 2 / 0.8 are handled by the same plugin.
+omemo = true
+auto_accept_subscriptions = true
+uploads = true
+upload_service = "upload.example.org"
+max_upload_mb = 40
+spool_dir = "~/.hermes-xmpp/spool"
+omemo_storage = "~/.hermes-xmpp/omemo.json"
+
+[rooms]
+# Rooms to join on startup. An empty join list disables multi-user chat.
+join = ["room@conference.example.org"]
+nick = "hermes"
+# "mention": only answer when addressed by nick; "always": answer every message.
+respond = "mention"
+# Only used when trust_nicks = true. Nick-only matching is spoofable in
+# anonymous rooms, so real-JID matching (non-anonymous rooms) is the default.
+owner_nicks = ["owner"]
+trust_nicks = false

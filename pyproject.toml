@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hermes-xmpp"
+dynamic = ["version"]
+description = "XMPP bridge for Hermes Agent: OMEMO 1:1 chats, MUC rooms, HTTP uploads"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "WOOSAH" }]
+keywords = ["xmpp", "jabber", "hermes", "agent", "omemo", "bot"]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Communications :: Chat",
+]
+dependencies = [
+    "slixmpp>=1.17,<2",
+    "slixmpp-omemo>=2.2",
+    "aiohttp>=3.9",
+    "cryptography>=41",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "py-spy>=0.3"]
+
+[tool.hatch.version]
+path = "hermes_xmpp/__init__.py"
+
+[project.scripts]
+hermes-xmpp = "hermes_xmpp.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/Smiley-McSmiles/hermes-xmpp"
+Repository = "https://github.com/Smiley-McSmiles/hermes-xmpp"
+Issues = "https://github.com/Smiley-McSmiles/hermes-xmpp/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["hermes_xmpp"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

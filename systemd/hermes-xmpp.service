@@ -1,0 +1,31 @@
+[Unit]
+Description=Hermes XMPP bridge (hermes-xmpp)
+Documentation=https://github.com/Smiley-McSmiles/hermes-xmpp
+Wants=network-online.target hermes-gateway.service
+After=network-online.target hermes-gateway.service
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.hermes-xmpp
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=HERMES_XMPP_CONFIG=%h/.hermes-xmpp/hermes.toml
+ExecStart=%h/.hermes-xmpp/venv/bin/python -m hermes_xmpp run
+Restart=always
+RestartSec=5
+TimeoutStopSec=20
+
+# The bridge is otherwise read-only: config and secrets are read, XMPP goes over
+# the network, and the agent is reached on loopback.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+# The deployment root holds the OMEMO identity, session ids and the attachment spool.
+ReadWritePaths=%h/.hermes-xmpp
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+LockPersonality=true
+
+[Install]
+WantedBy=default.target
